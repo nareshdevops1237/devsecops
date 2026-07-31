@@ -41,12 +41,16 @@ resource "azurerm_network_interface" "app_nic" {
   name                = "app-nic"
   location            = var.location
   resource_group_name = azurerm_resource_group.this.name
+  
 
   ip_configuration {
     name                          = "app-ip"
     subnet_id                     = azurerm_subnet.this["vnet-app.snet-app-web"].id
     private_ip_address_allocation = "Dynamic"
   }
+    depends_on = [
+    azurerm_subnet.this
+]
 }
 
 resource "azurerm_network_interface" "db_nic" {
@@ -59,6 +63,9 @@ resource "azurerm_network_interface" "db_nic" {
     subnet_id                     = azurerm_subnet.this["vnet-app.snet-app-db"].id
     private_ip_address_allocation = "Dynamic"
   }
+    depends_on = [
+    azurerm_subnet.this
+]
 }
 
 resource "azurerm_linux_virtual_machine" "app_vm" {
