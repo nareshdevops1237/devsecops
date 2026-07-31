@@ -1,0 +1,6 @@
+﻿{
+  "name": "github-production-env-immutable",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:nareshdevops1237@89703059/devsecops@1318118785:environment:production",
+  "audiences": ["api://AzureADTokenExchange"]
+}
