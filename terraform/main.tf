@@ -19,9 +19,9 @@ locals {
     for vnet_key, vnet in var.virtual_networks : {
       for subnet_key, subnet in vnet.subnets :
       "${vnet_key}.${subnet_key}" => {
-        vnet_key          = vnet_key
-        subnet_name       = subnet_key
-        address_prefixes  = subnet.address_prefixes
+        vnet_key         = vnet_key
+        subnet_name      = subnet_key
+        address_prefixes = subnet.address_prefixes
       }
     }
   ]...)
