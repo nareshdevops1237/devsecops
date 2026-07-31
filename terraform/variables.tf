@@ -10,6 +10,7 @@ variable "location" {
   default     = "eastus"
 }
 
+
 # One entry per VNet you want created. Add/remove entries here to
 # scale beyond 2 without touching main.tf.
 variable "virtual_networks" {
@@ -40,3 +41,5 @@ variable "virtual_networks" {
     }
   }
 }
+
+

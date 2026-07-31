@@ -13,6 +13,7 @@ resource "azurerm_virtual_network" "this" {
   tags                = each.value.tags
 }
 
+
 # Flatten vnet -> subnet map so each subnet is its own resource instance
 locals {
   subnets = merge([
@@ -34,4 +35,84 @@ resource "azurerm_subnet" "this" {
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this[each.value.vnet_key].name
   address_prefixes     = each.value.address_prefixes
+}
+
+resource "azurerm_network_interface" "app_nic" {
+  name                = "app-nic"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
+
+  ip_configuration {
+    name                          = "app-ip"
+    subnet_id                     = azurerm_subnet.this["vnet-app.snet-app-web"].id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_network_interface" "db_nic" {
+  name                = "db-nic"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
+
+  ip_configuration {
+    name                          = "db-ip"
+    subnet_id                     = azurerm_subnet.this["vnet-app.snet-app-db"].id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "app_vm" {
+  name                = "app-vm"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
+  size                = "Standard_B2s"
+
+  admin_username = "azureuser"
+  admin_password = "Password123!"
+
+  disable_password_authentication = false
+
+  network_interface_ids = [
+    azurerm_network_interface.app_nic.id
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "app_vm" {
+  name                = "app-vm"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
+  size                = "Standard_B2s"
+
+  admin_username = "azureuser"
+  admin_password = "Password123!"
+
+  disable_password_authentication = false
+
+  network_interface_ids = [
+    azurerm_network_interface.app_nic.id
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
 }
