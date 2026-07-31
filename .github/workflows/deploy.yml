@@ -58,8 +58,8 @@ jobs:
             -backend-config="key=vnet-cicd.tfstate"
 
       - name: Terraform upgrade
-        run: terraform validate
-        
+        run: terraform init -upgrade
+
       - name: Terraform Format Check
         run: terraform fmt -check
 
