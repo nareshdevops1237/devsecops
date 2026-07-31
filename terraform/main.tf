@@ -89,8 +89,8 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
   }
 }
 
-resource "azurerm_linux_virtual_machine" "app_vm" {
-  name                = "app-vm"
+resource "azurerm_linux_virtual_machine" "db_vm" {
+  name                = "db-vm"
   location            = var.location
   resource_group_name = azurerm_resource_group.this.name
   size                = "Standard_B2s"
@@ -101,7 +101,7 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
   disable_password_authentication = false
 
   network_interface_ids = [
-    azurerm_network_interface.app_nic.id
+    azurerm_network_interface.db_nic.id
   ]
 
   os_disk {
