@@ -75,6 +75,12 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: terraform apply -auto-approve -input=false tfplan ##added the comment 2
 
+      - name: Show repository structure
+        run: |
+          pwd
+          ls -la
+          find . -type f
+
       - name: Generate inventory
         run: |
           chmod +x scripts/generate-inventory.sh
