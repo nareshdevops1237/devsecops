@@ -111,7 +111,7 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-focal"
     sku       = "20_04-lts-gen2"  # <--- Matches the Gen2 x64 SKU from your output
-    version   = "20.04.202505200" # <--- Matches the exact version you found, or use "latest
+    version   = "20.04.202505200" # <--- Matches the exact version you found, or use "latest"
   }
 }
 
