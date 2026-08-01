@@ -83,8 +83,18 @@ jobs:
 
       - name: Generate inventory
         run: |
-          chmod +x scripts/generate-inventory.sh
-          ./scripts/generate-inventory.sh
+          APP_IP=$(terraform output -raw app_public_ip)
+          DB_IP=$(terraform output -raw db_public_ip)
+
+          mkdir -p ../ansible
+
+          cat > ../ansible/inventory.ini <<EOF
+          [app]
+          $APP_IP ansible_user=azureuser
+
+          [db]
+          $DB_IP ansible_user=azureuser
+          EOF
 
       - name: Write SSH key
         run: |
