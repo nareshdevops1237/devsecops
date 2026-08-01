@@ -68,7 +68,7 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
   name                = "app-vm"
   location            = var.location
   resource_group_name = azurerm_resource_group.this.name
-  size                = "Standard_B2s"
+  size                = "Standard_D4ls_v7"
 
   admin_username = "azureuser"
   admin_password = "Password123!"
@@ -97,7 +97,7 @@ resource "azurerm_linux_virtual_machine" "db_vm" {
   name                = "db-vm"
   location            = var.location
   resource_group_name = azurerm_resource_group.this.name
-  size                = "Standard_B2s"
+  size                = "Standard_D4ls_v7"
 
   admin_username = "azureuser"
   admin_password = "Password123!"

@@ -59,20 +59,7 @@ jobs:
 
       - name: Terraform upgrade
         run: terraform init -upgrade
-
-      - name: Terraform Import (Web Subnet)
-        run: |
-          terraform import \
-            'azurerm_subnet.this["vnet-app.snet-app-web"]' \
-            '/subscriptions/a8602307-fe44-482d-9e38-26c273e1cb1a/resourceGroups/rg-networking-demo/providers/Microsoft.Network/virtualNetworks/vnet-app/subnets/snet-app-web'
-
-      - name: Terraform Import (DB Subnet)
-        run: |
-          terraform import \
-            'azurerm_subnet.this["vnet-app.snet-app-db"]' \
-            '/subscriptions/a8602307-fe44-482d-9e38-26c273e1cb1a/resourceGroups/rg-networking-demo/providers/Microsoft.Network/virtualNetworks/vnet-app/subnets/snet-app-db'
-      
-      
+        
       - name: Terraform Format Check
         run: terraform fmt -check
 
