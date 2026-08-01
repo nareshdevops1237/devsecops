@@ -116,7 +116,10 @@ jobs:
         run: |
           ssh-keyscan ${APP_IP} >> ~/.ssh/known_hosts
           ssh-keyscan ${DB_IP} >> ~/.ssh/known_hosts
-
+      - name: Install Ansible
+        run: |
+          python3 -m pip install "ansible-core<2.18"
+          
       - name: Execute playbook
         working-directory: ${{ github.workspace }}
         run: |
