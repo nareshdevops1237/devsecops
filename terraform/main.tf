@@ -92,6 +92,7 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
   }
 }
 
+
 resource "azurerm_linux_virtual_machine" "db_vm" {
   name                = "db-vm"
   location            = var.location
