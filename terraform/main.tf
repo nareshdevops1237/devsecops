@@ -86,9 +86,9 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2" # <--- Matches the Gen2 x64 SKU from your output
+    version   = "20.04.202505200" # <--- Matches the exact version you found, or use "latest"
   }
 }
 
@@ -114,8 +114,8 @@ resource "azurerm_linux_virtual_machine" "db_vm" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2" # <--- Matches the Gen2 x64 SKU from your output
+    version   = "20.04.202505200" # <--- Matches the exact version you found, or use "latest"
   }
 }
