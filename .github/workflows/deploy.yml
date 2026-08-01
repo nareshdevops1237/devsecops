@@ -60,12 +60,6 @@ jobs:
       - name: Terraform upgrade
         run: terraform init -upgrade
       
-      - name: Remove stale subnets from state and reapply
-        run: |
-          terraform state rm 'azurerm_subnet.this["vnet-app.snet-app-web"]'
-          terraform state rm 'azurerm_subnet.this["vnet-app.snet-app-db"]'
-          
-
       - name: Terraform Format Check
         run: terraform fmt -check
 
