@@ -107,7 +107,11 @@ jobs:
           pwd
           ls -la
           find . -type f
-
+      - name: Add hosts to known_hosts
+        run: |
+          ssh-keyscan ${APP_IP} >> ~/.ssh/known_hosts
+          ssh-keyscan ${DB_IP} >> ~/.ssh/known_hosts
+          
       - name: Execute playbook
         working-directory: ${{ github.workspace }}
         run: |
