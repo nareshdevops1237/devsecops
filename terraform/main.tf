@@ -95,7 +95,7 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = file("${path.module}/keys/azure_vm_key.pub")
+    public_key = var.ssh_public_key
   }
 
   network_interface_ids = [
@@ -128,7 +128,7 @@ resource "azurerm_linux_virtual_machine" "db_vm" {
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = file("${path.module}/keys/azure_vm_key.pub")
+    public_key = var.ssh_public_key
   }
 
   network_interface_ids = [
