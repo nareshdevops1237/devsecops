@@ -86,6 +86,12 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/azure_vm_key
           chmod 600 ~/.ssh/azure_vm_key
 
+      - name: Show repository structure
+        run: |
+          pwd
+          ls -la
+          find . -type f
+
       - name: Execute playbook
         run: |
           ansible-playbook \
