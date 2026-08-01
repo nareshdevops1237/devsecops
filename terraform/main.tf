@@ -60,12 +60,12 @@ resource "azurerm_network_interface" "app_nic" {
   resource_group_name = azurerm_resource_group.this.name
 
 
-ip_configuration {
-  name                          = "app-ip"
-  subnet_id                     = azurerm_subnet.this["vnet-app.snet-app-web"].id
-  private_ip_address_allocation = "Dynamic"
-  public_ip_address_id          = azurerm_public_ip.app_pip.id
-}
+  ip_configuration {
+    name                          = "app-ip"
+    subnet_id                     = azurerm_subnet.this["vnet-app.snet-app-web"].id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.app_pip.id
+  }
 
 }
 
@@ -90,9 +90,13 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
   size                = "Standard_D4ls_v7"
 
   admin_username = "azureuser"
-  admin_password = "Password123!"
 
-  disable_password_authentication = false
+  disable_password_authentication = true
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = file("${path.module}/keys/azure_vm_key.pub")
+  }
 
   network_interface_ids = [
     azurerm_network_interface.app_nic.id
@@ -119,9 +123,13 @@ resource "azurerm_linux_virtual_machine" "db_vm" {
   size                = "Standard_D4ls_v7"
 
   admin_username = "azureuser"
-  admin_password = "Password123!"
 
-  disable_password_authentication = false
+  disable_password_authentication = true
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = file("${path.module}/keys/azure_vm_key.pub")
+  }
 
   network_interface_ids = [
     azurerm_network_interface.db_nic.id
@@ -147,49 +155,49 @@ resource "azurerm_network_security_group" "app_nsg" {
 }
 
 resource "azurerm_network_security_rule" "allow_ssh" {
-  name                        = "allow-ssh"
-  priority                    = 100
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "22"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
+  name                       = "allow-ssh"
+  priority                   = 100
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "22"
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
 
   resource_group_name         = azurerm_resource_group.this.name
   network_security_group_name = azurerm_network_security_group.app_nsg.name
 }
 
 resource "azurerm_network_security_rule" "allow_app" {
-  name                        = "allow-app"
-  priority                    = 110
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
+  name      = "allow-app"
+  priority  = 110
+  direction = "Inbound"
+  access    = "Allow"
+  protocol  = "Tcp"
 
-  source_port_range           = "*"
-  destination_port_range      = "8080"
+  source_port_range      = "*"
+  destination_port_range = "8080"
 
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
 
   resource_group_name         = azurerm_resource_group.this.name
   network_security_group_name = azurerm_network_security_group.app_nsg.name
 }
 
 resource "azurerm_network_security_rule" "allow_postgres" {
-  name                        = "allow-postgres"
-  priority                    = 120
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
+  name      = "allow-postgres"
+  priority  = 120
+  direction = "Inbound"
+  access    = "Allow"
+  protocol  = "Tcp"
 
-  source_port_range           = "*"
-  destination_port_range      = "5432"
+  source_port_range      = "*"
+  destination_port_range = "5432"
 
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
 
   resource_group_name         = azurerm_resource_group.this.name
   network_security_group_name = azurerm_network_security_group.app_nsg.name

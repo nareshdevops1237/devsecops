@@ -79,8 +79,15 @@ jobs:
           chmod +x scripts/generate-inventory.sh
           ./scripts/generate-inventory.sh
 
-      - name: Run playbook
+      - name: Write SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/azure_vm_key
+          chmod 600 ~/.ssh/azure_vm_key
+
+      - name: Execute playbook
         run: |
           ansible-playbook \
             -i ansible/inventory.ini \
-            ansible/site.yml
+            ansible/site.yml \
+            --private-key ~/.ssh/azure_vm_key
