@@ -73,3 +73,6 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: terraform apply -auto-approve -input=false tfplan ##added the comment 2
+      - name: Terraform Destroy
+        run: |
+          terraform destroy -auto-approve -input=false
