@@ -59,6 +59,12 @@ jobs:
 
       - name: Terraform upgrade
         run: terraform init -upgrade
+      
+      - name: Remove stale subnets from state and reapply
+        run: |
+          terraform state rm 'azurerm_subnet.this["vnet-app.snet-app-web"]'
+          terraform state rm 'azurerm_subnet.this["vnet-app.snet-app-db"]'
+          
 
       - name: Terraform Format Check
         run: terraform fmt -check
@@ -68,7 +74,7 @@ jobs:
   
       - name: Terraform Plan
         id: plan
-        run: terraform plan -out=tfplan -input=false
+        run: terraform plan -out=tfplan -input=true
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
