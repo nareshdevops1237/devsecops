@@ -37,17 +37,35 @@ resource "azurerm_subnet" "this" {
   address_prefixes     = each.value.address_prefixes
 }
 
+resource "azurerm_public_ip" "app_pip" {
+  name                = "app-pip"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
+
+  allocation_method = "Static"
+  sku               = "Standard"
+}
+
+resource "azurerm_public_ip" "db_pip" {
+  name                = "db-pip"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
+
+  allocation_method = "Static"
+  sku               = "Standard"
+}
 resource "azurerm_network_interface" "app_nic" {
   name                = "app-nic"
   location            = var.location
   resource_group_name = azurerm_resource_group.this.name
 
 
-  ip_configuration {
-    name                          = "app-ip"
-    subnet_id                     = azurerm_subnet.this["vnet-app.snet-app-web"].id
-    private_ip_address_allocation = "Dynamic"
-  }
+ip_configuration {
+  name                          = "app-ip"
+  subnet_id                     = azurerm_subnet.this["vnet-app.snet-app-web"].id
+  private_ip_address_allocation = "Dynamic"
+  public_ip_address_id          = azurerm_public_ip.app_pip.id
+}
 
 }
 
@@ -60,6 +78,7 @@ resource "azurerm_network_interface" "db_nic" {
     name                          = "db-ip"
     subnet_id                     = azurerm_subnet.this["vnet-app.snet-app-db"].id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.db_pip.id
   }
 
 }
@@ -119,4 +138,67 @@ resource "azurerm_linux_virtual_machine" "db_vm" {
     sku       = "20_04-lts-gen2"  # <--- Matches the Gen2 x64 SKU from your output
     version   = "20.04.202505200" # <--- Matches the exact version you found, or use "latest"
   }
+}
+
+resource "azurerm_network_security_group" "app_nsg" {
+  name                = "app-nsg"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
+}
+
+resource "azurerm_network_security_rule" "allow_ssh" {
+  name                        = "allow-ssh"
+  priority                    = 100
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "22"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+
+  resource_group_name         = azurerm_resource_group.this.name
+  network_security_group_name = azurerm_network_security_group.app_nsg.name
+}
+
+resource "azurerm_network_security_rule" "allow_app" {
+  name                        = "allow-app"
+  priority                    = 110
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+
+  source_port_range           = "*"
+  destination_port_range      = "8080"
+
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+
+  resource_group_name         = azurerm_resource_group.this.name
+  network_security_group_name = azurerm_network_security_group.app_nsg.name
+}
+
+resource "azurerm_network_security_rule" "allow_postgres" {
+  name                        = "allow-postgres"
+  priority                    = 120
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+
+  source_port_range           = "*"
+  destination_port_range      = "5432"
+
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+
+  resource_group_name         = azurerm_resource_group.this.name
+  network_security_group_name = azurerm_network_security_group.app_nsg.name
+}
+resource "azurerm_subnet_network_security_group_association" "app_assoc" {
+  subnet_id                 = azurerm_subnet.this["vnet-app.snet-app-web"].id
+  network_security_group_id = azurerm_network_security_group.app_nsg.id
+}
+resource "azurerm_subnet_network_security_group_association" "db_assoc" {
+  subnet_id                 = azurerm_subnet.this["vnet-app.snet-app-db"].id
+  network_security_group_id = azurerm_network_security_group.app_nsg.id
 }

@@ -73,6 +73,14 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: terraform apply -auto-approve -input=false tfplan ##added the comment 2
-      - name: Terraform Destroy
+
+      - name: Generate inventory
         run: |
-          terraform destroy -auto-approve -input=false
+          chmod +x scripts/generate-inventory.sh
+          ./scripts/generate-inventory.sh
+
+      - name: Run playbook
+        run: |
+          ansible-playbook \
+            -i ansible/inventory.ini \
+            ansible/site.yml
