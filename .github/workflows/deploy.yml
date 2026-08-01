@@ -119,7 +119,7 @@ jobs:
       - name: Install Ansible
         run: |
           python3 -m pip install "ansible-core<2.18"
-          
+
       - name: Execute playbook
         working-directory: ${{ github.workspace }}
         run: |
@@ -127,3 +127,6 @@ jobs:
             -i ansible/inventory.ini \
             ansible/site.yml \
             --private-key ~/.ssh/azure_vm_key
+
+      - name: Destroy Terraform resources
+        run: terraform destroy -auto-approve -input=false
