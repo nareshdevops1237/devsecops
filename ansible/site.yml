@@ -1,26 +1,30 @@
 ---
+- name: Bootstrap Python
+  hosts: all
+  gather_facts: false
+  become: true
+
+  tasks:
+
+    - name: Update package cache
+      raw: sudo apt-get update
+
+    - name: Install Python 3.9
+      raw: sudo apt-get install -y python3.9 python3.9-distutils
+
 - name: Configure application server
   hosts: app
   become: true
 
   tasks:
 
-    - name: Update packages
-      apt:
-        update_cache: true
+    - name: Gather facts
+      setup:
 
     - name: Install Java
       apt:
         name: openjdk-17-jdk
         state: present
-
-    - name: Verify Java installation
-      command: java -version
-      register: java_version
-
-    - debug:
-        var: java_version.stderr
-
 
 - name: Configure database server
   hosts: db
@@ -28,9 +32,8 @@
 
   tasks:
 
-    - name: Update packages
-      apt:
-        update_cache: true
+    - name: Gather facts
+      setup:
 
     - name: Install PostgreSQL
       apt:
@@ -38,9 +41,3 @@
           - postgresql
           - postgresql-contrib
         state: present
-
-    - name: Start PostgreSQL
-      service:
-        name: postgresql
-        state: started
-        enabled: true
