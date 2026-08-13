@@ -280,3 +280,4 @@ resource "azurerm_network_interface_backend_address_pool_association" "app_vm_as
   ip_configuration_name   = "app-ip"
   backend_address_pool_id = azurerm_lb_backend_address_pool.app_backend_pool.id
 }
+//
