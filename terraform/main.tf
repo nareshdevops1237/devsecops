@@ -235,6 +235,14 @@ resource "azurerm_lb" "app_lb" {
   }
 }
 
+# NOTE: This resource was missing from the merged file — added back here.
+# It's required by both azurerm_lb_rule.app_lb_rule and
+# azurerm_network_interface_backend_address_pool_association.app_vm_assoc below.
+resource "azurerm_lb_backend_address_pool" "app_backend_pool" {
+  loadbalancer_id = azurerm_lb.app_lb.id
+  name            = "backend-pool-app"
+}
+
 resource "azurerm_lb_probe" "app_probe" {
   loadbalancer_id     = azurerm_lb.app_lb.id
   name                = "http-probe"
