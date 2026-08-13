@@ -18,3 +18,10 @@ output "app_public_ip" {
 output "db_public_ip" {
   value = azurerm_public_ip.db_pip.ip_address
 }
+output "load_balancer_public_ip" {
+  value = azurerm_public_ip.lb_pip.ip_address
+}
+
+output "load_balancer_id" {
+  value = azurerm_lb.app_lb.id
+}

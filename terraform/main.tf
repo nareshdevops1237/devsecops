@@ -211,4 +211,69 @@ resource "azurerm_subnet_network_security_group_association" "db_assoc" {
   network_security_group_id = azurerm_network_security_group.app_nsg.id
 }
 
+data "azurerm_network_interface" "app_vm_nic" {
+  name                = "app-nic"
+  resource_group_name = "rg-networking-demo"
+}
 
+resource "azurerm_public_ip" "lb_pip" {
+  name                = "pip-lb-app"
+  location            = "East US 2"
+  resource_group_name = "rg-networking-demo"
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+resource "azurerm_lb" "app_lb" {
+  name                = "lb-app"
+  location            = "East US 2"
+  resource_group_name = "rg-networking-demo"
+  sku                 = "Standard"
+
+  frontend_ip_configuration {
+    name                 = "frontend-ip"
+    public_ip_address_id = azurerm_public_ip.lb_pip.id
+  }
+}
+
+resource "azurerm_lb_probe" "app_probe" {
+  loadbalancer_id     = azurerm_lb.app_lb.id
+  name                = "http-probe"
+  port                = 80
+  protocol            = "Tcp"
+  interval_in_seconds = 15
+  number_of_probes    = 2
+}
+
+resource "azurerm_lb_rule" "app_lb_rule" {
+  loadbalancer_id                = azurerm_lb.app_lb.id
+  name                            = "http-rule"
+  protocol                        = "Tcp"
+  frontend_port                   = 80
+  backend_port                    = 80
+  frontend_ip_configuration_name  = "frontend-ip"
+  backend_address_pool_ids        = [azurerm_lb_backend_address_pool.app_backend_pool.id]
+  probe_id                        = azurerm_lb_probe.app_probe.id
+}
+
+resource "azurerm_lb_nat_rule" "ssh_nat_rule" {
+  resource_group_name            = "rg-networking-demo"
+  loadbalancer_id                = azurerm_lb.app_lb.id
+  name                            = "ssh-nat-rule"
+  protocol                        = "Tcp"
+  frontend_port                   = 2222
+  backend_port                    = 22
+  frontend_ip_configuration_name  = "frontend-ip"
+}
+
+resource "azurerm_network_interface_nat_rule_association" "ssh_nat_assoc" {
+  network_interface_id = data.azurerm_network_interface.app_vm_nic.id
+  ip_configuration_name = "app-ip"
+  nat_rule_id           = azurerm_lb_nat_rule.ssh_nat_rule.id
+}
+
+
+resource "azurerm_network_interface_backend_address_pool_association" "app_vm_assoc" {
+  network_interface_id    = data.azurerm_network_interface.app_vm_nic.id
+  ip_configuration_name   = "app-ip"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.app_backend_pool.id
+}
