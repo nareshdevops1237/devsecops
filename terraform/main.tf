@@ -211,22 +211,17 @@ resource "azurerm_subnet_network_security_group_association" "db_assoc" {
   network_security_group_id = azurerm_network_security_group.app_nsg.id
 }
 
-data "azurerm_network_interface" "app_vm_nic" {
-  name                = "app-nic"
-  resource_group_name = "rg-networking-demo"
-}
-
 resource "azurerm_public_ip" "lb_pip" {
   name                = "pip-lb-app"
-  location            = "East US 2"
-  resource_group_name = "rg-networking-demo"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
   sku                 = "Standard"
 }
 resource "azurerm_lb" "app_lb" {
   name                = "lb-app"
-  location            = "East US 2"
-  resource_group_name = "rg-networking-demo"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
   sku                 = "Standard"
 
   frontend_ip_configuration {
@@ -264,7 +259,7 @@ resource "azurerm_lb_rule" "app_lb_rule" {
 }
 
 resource "azurerm_lb_nat_rule" "ssh_nat_rule" {
-  resource_group_name            = "rg-networking-demo"
+  resource_group_name            = azurerm_resource_group.this.name
   loadbalancer_id                = azurerm_lb.app_lb.id
   name                           = "ssh-nat-rule"
   protocol                       = "Tcp"
@@ -274,18 +269,14 @@ resource "azurerm_lb_nat_rule" "ssh_nat_rule" {
 }
 
 resource "azurerm_network_interface_nat_rule_association" "ssh_nat_assoc" {
-  network_interface_id  = data.azurerm_network_interface.app_vm_nic.id
+  network_interface_id  = azurerm_network_interface.app_nic.id
   ip_configuration_name = "app-ip"
   nat_rule_id           = azurerm_lb_nat_rule.ssh_nat_rule.id
 }
 
 
 resource "azurerm_network_interface_backend_address_pool_association" "app_vm_assoc" {
-  network_interface_id    = data.azurerm_network_interface.app_vm_nic.id
+  network_interface_id    = azurerm_network_interface.app_nic.id
   ip_configuration_name   = "app-ip"
   backend_address_pool_id = azurerm_lb_backend_address_pool.app_backend_pool.id
 }
-
-
-
-// NOTE: The following resource was missing from the merged file — added back here.
