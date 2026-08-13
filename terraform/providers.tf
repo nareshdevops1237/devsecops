@@ -14,8 +14,8 @@ terraform {
   backend "azurerm" {
     resource_group_name  = "rg-tfstate"
     storage_account_name = "sttfstatevnetcicd"
-    container_name        = "tfstate"
-    key                    = "networking/terraform.tfstate"
+    container_name       = "tfstate"
+    key                  = "networking/terraform.tfstate"
   }
 }
 

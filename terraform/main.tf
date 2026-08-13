@@ -246,27 +246,27 @@ resource "azurerm_lb_probe" "app_probe" {
 
 resource "azurerm_lb_rule" "app_lb_rule" {
   loadbalancer_id                = azurerm_lb.app_lb.id
-  name                            = "http-rule"
-  protocol                        = "Tcp"
-  frontend_port                   = 80
-  backend_port                    = 80
-  frontend_ip_configuration_name  = "frontend-ip"
-  backend_address_pool_ids        = [azurerm_lb_backend_address_pool.app_backend_pool.id]
-  probe_id                        = azurerm_lb_probe.app_probe.id
+  name                           = "http-rule"
+  protocol                       = "Tcp"
+  frontend_port                  = 80
+  backend_port                   = 80
+  frontend_ip_configuration_name = "frontend-ip"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.app_backend_pool.id]
+  probe_id                       = azurerm_lb_probe.app_probe.id
 }
 
 resource "azurerm_lb_nat_rule" "ssh_nat_rule" {
   resource_group_name            = "rg-networking-demo"
   loadbalancer_id                = azurerm_lb.app_lb.id
-  name                            = "ssh-nat-rule"
-  protocol                        = "Tcp"
-  frontend_port                   = 2222
-  backend_port                    = 22
-  frontend_ip_configuration_name  = "frontend-ip"
+  name                           = "ssh-nat-rule"
+  protocol                       = "Tcp"
+  frontend_port                  = 2222
+  backend_port                   = 22
+  frontend_ip_configuration_name = "frontend-ip"
 }
 
 resource "azurerm_network_interface_nat_rule_association" "ssh_nat_assoc" {
-  network_interface_id = data.azurerm_network_interface.app_vm_nic.id
+  network_interface_id  = data.azurerm_network_interface.app_vm_nic.id
   ip_configuration_name = "app-ip"
   nat_rule_id           = azurerm_lb_nat_rule.ssh_nat_rule.id
 }
