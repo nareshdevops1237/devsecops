@@ -210,3 +210,5 @@ resource "azurerm_subnet_network_security_group_association" "db_assoc" {
   subnet_id                 = azurerm_subnet.this["vnet-app.snet-app-db"].id
   network_security_group_id = azurerm_network_security_group.app_nsg.id
 }
+
+

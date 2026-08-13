@@ -11,7 +11,12 @@ terraform {
   # Remote state in Azure Storage.
   # Values are supplied at `terraform init` time via -backend-config
   # (see the GitHub Actions workflow), so no secrets live in this file.
-  backend "azurerm" {}
+  backend "azurerm" {
+    resource_group_name  = "rg-tfstate"
+    storage_account_name = "sttfstatevnetcicd"
+    container_name        = "tfstate"
+    key                    = "networking/terraform.tfstate"
+  }
 }
 
 provider "azurerm" {
